@@ -27,6 +27,10 @@ public class GamePanel extends JPanel implements ActionListener {
   int applesEaten;
   int appleX;
   int appleY;
+  int bonusAppleX;
+  int bonusAppleY;
+  int counter;
+  int bonusAppleCount;
   char direction = 'R';
   boolean running = false;
   Timer timer;
@@ -62,9 +66,17 @@ public class GamePanel extends JPanel implements ActionListener {
       // g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
       // g.drawLine(0, i * UNIT_SIZE, i * SCREEN_WIDTH, i * UNIT_SIZE);
       // }
+      // draw apple
       g.setColor(Color.red);
       g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
+      // draw bonus apples
+      if (applesEaten % 5 == 0 && applesEaten != 0) {
+        g.setColor(new Color(45, 180, 0));
+        g.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
+        g.fillOval(bonusAppleX, bonusAppleY, UNIT_SIZE, UNIT_SIZE);
+      }
+      // draw snake
       for (int i = 0; i < bodyParts; i++) {
         if (i == 0) {
           g.setColor(Color.green);
@@ -76,6 +88,7 @@ public class GamePanel extends JPanel implements ActionListener {
           g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
         }
       }
+      // draw score
       g.setColor(Color.red);
       g.setFont(new Font("Ink Free", Font.BOLD, 30));
       FontMetrics metrics = getFontMetrics(g.getFont());
@@ -87,9 +100,20 @@ public class GamePanel extends JPanel implements ActionListener {
   }
 
   public void newApple() {
+    // apple
     appleX = random.nextInt((SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
     appleY = random.nextInt((SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
 
+    // bonus apple
+    bonusAppleX = random.nextInt((SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
+    bonusAppleY = random.nextInt((SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
+    new java.util.Timer().schedule(new java.util.TimerTask() {
+      @Override
+      public void run() {
+        bonusAppleX = -100;
+        bonusAppleY = -100;
+      }
+    }, 5000);
   }
 
   public void move() {
@@ -118,10 +142,15 @@ public class GamePanel extends JPanel implements ActionListener {
   }
 
   public void checkApple() {
-
     if ((x[0] == appleX) && (y[0] == appleY)) {
       bodyParts++;
       applesEaten++;
+      counter++;
+      newApple();
+    }
+    if ((x[0] == bonusAppleX) && (y[0] == bonusAppleY)) {
+      bodyParts++;
+      applesEaten += 2;
       newApple();
     }
 
